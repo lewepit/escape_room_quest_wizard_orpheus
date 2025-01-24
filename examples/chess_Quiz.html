@@ -1,0 +1,83 @@
+<html>
+
+<head>
+  <title>Club Noise Generator</title>
+  <style>
+    html,
+    body {
+      transition: background-color 5s ease;
+      zoom: 1.25;
+    }
+
+    #input {
+      width: 400px;
+      max-width: 100%;
+
+      height: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <p>your job is answered correctly to the questions about a chess. start by saying'Hi':</p>
+  <div id="conversation"></div>
+  <textarea id="input"></textarea><br>
+  <i>(press enter to submit)</i>
+  <p>
+    Question 1: <span id="questionOne"> no</span><br>
+    Question 2: <span id="questionTwo"> no</span><br>
+    Question 3: <span id="questionThree"> no</span><br>
+    Question 4: <span id="questionFour"> no</span><br>
+  </p>
+
+  <script src="../wizard_orpheus.js"></script>
+  <script>
+    let api_key = 'YOUR_API_KEY'
+    let pytania = `You have to ask 3 questions and get three answers. Question number 1: who was a world champion of the classic chess in 2024? The answer to question number 1 is "Dommaraju Gukesh". question number two: how to start the defense of Sicilian? Answer to question number two is "C5". Question number 3: what is the most popular first move in chess?  Answer to question number 3: " E4 "  . question number four: who has the most ELO on chess.com? answer to question number four : Hikaru Nakamura. write the question exactly as written. ask question one first, and when the user answers, ask question two. when user answered to question two ask question three. when user answered to question three ask question four.`
+
+    let  warunki = `you are a chess player and you ask questions about chess, but you do not answer the player's questions. when the answer is good, congratulate. write a question and congratulations in one sentence, or a question and a notification that the answer is wrong. If the user answered the question correctly, ask him the next one. when you ask question number one the user answers question number one. reply once per user's reply.`
+    let rugMan = new WizardOrpheus(api_key, pytania+warunki )
+ 
+
+
+    rugMan.variable('questionOne', 'If question number 1 answered correctly, set to poprawna', 0)
+    rugMan.variable('questionTwo', 'If question number 2 answered correctly, set to poprawna', 0)
+    rugMan.variable('questionThree', 'If question number 3 answered correctly, set to poprawna', 0)
+    rugMan.variable('questionFour', 'If question number 4 answered correctly, set to poprawna', 0)
+
+    rugMan.createUserAction({
+      name: 'sendMessage',
+      parameters: ['A message from the user to the spirit'],
+      howBotShouldHandle: "Respond to the user's message."
+    })
+
+    rugMan.botAction('respond', 'Respond to the user', { response: 'sample response' }, data => {
+      document.getElementById('conversation').innerHTML += `<p>${data.response}</p> `
+      let quest1 = data.currentVariables.questionOne.value === 1 ? "Yes" : "No"
+      let quest2 = data.currentVariables.questionTwo.value === 1 ? "Yes" : "No"
+      let quest3 = data.currentVariables.questionThree.value === 1 ? "Yes" : "No"
+      let quest4 = data.currentVariables.questionFour.value === 1 ? "Yes" : "No"
+      document.getElementById('questionOne').innerText = quest1
+      document.getElementById('questionTwo').innerText = quest2
+      document.getElementById('questionThree').innerText = quest3
+      document.getElementById('questionFour').innerText = quest4
+
+     
+    })
+
+   
+
+    document.getElementById('input').addEventListener('keyup', function (e) {
+      if (e.keyCode === 13) { // if the user presses enter
+        let userInput = document.getElementById('input').value
+
+        rugMan.sendMessage(userInput)
+
+        document.getElementById('conversation').innerHTML += `<p>${userInput}</p>`
+        document.getElementById('input').value = ''
+      }
+    })
+  </script>
+</body>
+
+</html>
